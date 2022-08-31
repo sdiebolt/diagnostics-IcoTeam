@@ -1,4 +1,4 @@
-# Diagnostics project
+# Diagnostics project - IcoTeam
 
 Scripts go in the `scripts` directory.
 
