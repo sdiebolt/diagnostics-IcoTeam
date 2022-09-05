@@ -52,14 +52,14 @@ def file_hash(filename):
     return sha1(byte_contents).hexdigest()
 
 
-def validate_data(data_directory):
-    """ Read ``hash_list.txt`` or ``data_hashes.txt`` file in from `group-*` directory in `data_directory`,
-    then check hashes. It will check all groups.
+def validate_data(*data_directories):
+    """ Read ``hash_list.txt`` from `data_directory`, then check hashes.
+    Accepts more than one data_directory using *args.
 
     Parameters
     ----------
     data_directory : str
-        Directory containing data and `group-*` directory where ``hash_list.txt`` file is.
+        Directory containing data and ``hash_list.txt``.
 
     Returns
     -------
