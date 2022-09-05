@@ -8,11 +8,6 @@ Run as:
 from pathlib import Path
 import sys
 from hashlib import sha1
-<<<<<<< HEAD
-=======
-
-
->>>>>>> e528fbfe775885cd6fe744203a89d16ffde9d147
 
 def file_hash(filename):
     """ Get byte contents of file `filename`, return SHA1 hash
@@ -82,7 +77,7 @@ def validate_data(*data_directories):
         If hash value for any file is different from hash value recorded in
         ``hash_list.txt`` file.
     """
-<<<<<<< HEAD
+
     for data_directory in data_directories:
         # Try data_directory as Path
         try:
@@ -92,16 +87,6 @@ def validate_data(*data_directories):
                 "data_directory argument must be a pathlib.Path (or a type that supports"
                 " casting to pathlib.Path, such as string)."
             )
-=======
-    # Try data_directory as Path
-    try:
-        data_directory = Path(data_directory)
-    except TypeError:
-        raise TypeError(
-            "data_directory argument must be a pathlib.Path (or a type that supports"
-            " casting to pathlib.Path, such as string)."
-        )
->>>>>>> e528fbfe775885cd6fe744203a89d16ffde9d147
 
         # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
         data_directory = data_directory.expanduser().resolve()
@@ -133,10 +118,6 @@ def validate_data(*data_directories):
                     f"Hashes were not validated. File {filename} expected hash was {expected_hash} and"
                     f" actual hash is {actual_hash}."
                 )
-<<<<<<< HEAD
-
-=======
->>>>>>> e528fbfe775885cd6fe744203a89d16ffde9d147
 
 def main():
     # This function (main) called when this file run as a script.
