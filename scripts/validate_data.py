@@ -7,7 +7,7 @@ Run as:
 
 from pathlib import Path
 import sys
-import hashlib
+from hashlib import sha1
 
 def file_hash(filename):
     """ Get byte contents of file `filename`, return SHA1 hash
