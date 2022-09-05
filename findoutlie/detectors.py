@@ -10,8 +10,7 @@ other on normally distributed values etc.  The routines should check that their
 requirements are met and raise an error otherwise.
 """
 
-# Any imports you need
-# +++your code here+++
+import numpy as np
 
 
 def iqr_detector(measures, iqr_proportion=1.5):
@@ -45,9 +44,10 @@ def iqr_detector(measures, iqr_proportion=1.5):
         A boolean vector of same length as `measures`, where True means the
         corresponding value in `measures` is an outlier.
     """
-    # Any imports you need
-    # Hints:
-    # * investigate np.percentile
-    # * You'll likely need np.logical_or
-    # https://textbook.nipraxis.org/numpy_logical.html
-    # +++your code here+++
+    q1, q3 = np.percentile(measures, (25, 75))
+    iqr = q3 - q1
+
+    outliers = np.logical_or(
+        measures > q3 + iqr * iqr_proportion, measures < q1 - iqr * iqr_proportion
+    )
+    return outliers
