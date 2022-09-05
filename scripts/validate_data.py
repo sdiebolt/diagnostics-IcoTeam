@@ -72,40 +72,35 @@ def validate_data(data_directory):
     ValueError :
         If `data_directory` returns False to `data_directory.is_dir()`
     ValueError :
-        If there is no ``hash_list.txt`` or ``data_hashes.txt`` file inside the group directories.
+        If `data_directory / hash_list.txt` returns False to `is_file()`
     ValueError:
         If hash value for any file is different from hash value recorded in
         ``hash_list.txt`` file.
     """
-    # Try data_directory as Path
-    try:
-        data_directory = Path(data_directory)
-    except TypeError:
-        raise TypeError(
-            "data_directory argument must be a pathlib.Path (or a type that supports"
-            " casting to pathlib.Path, such as string)."
-        )
+    for data_directory in data_directories:
+        # Try data_directory as Path
+        try:
+            data_directory = Path(data_directory)
+        except TypeError:
+            raise TypeError(
+                "data_directory argument must be a pathlib.Path (or a type that supports"
+                " casting to pathlib.Path, such as string)."
+            )
 
-    # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
-    data_directory = data_directory.expanduser().resolve()
+        # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
+        data_directory = data_directory.expanduser().resolve()
 
-    # Check if directory exists
-    if not data_directory.is_dir():
-        raise ValueError(f"Directory not found: {data_directory}.")
-    
-    # Get hash list using glob to potentially validate more than one group at a time
-    hash_paths = list(data_directory.glob("group-*/hash_list.txt"))
-    # Get either `hash_list.txt` or `data_hashes.txt`
-    hash_paths += list(data_directory.glob("group-*/data_hashes.txt"))
+        # Check if directory exists
+        if not data_directory.is_dir():
+            raise ValueError(f"Directory not found: {data_directory}.")
+        
+        # Get hash file path
+        hash_path = data_directory / "hash_list.txt"
 
-    # Check if any hash file exist
-    if not hash_paths:
-        raise ValueError(
-            "No `hash_list.txt` or `data_hashes.txt` file was found in"
-            f" {data_directory / 'group-*'}."
-        )
+        # Check if any hash file exist
+        if not hash_path.is_file():
+            raise ValueError(f"File not found: {hash_path}.")
 
-    for hash_path in hash_paths:
         # Read lines from ``data_hashes.txt`` file.
         hashes_lines = hash_path.read_text().splitlines()
         for line in hashes_lines:
@@ -127,15 +122,15 @@ def validate_data(data_directory):
 def main():
     # This function (main) called when this file run as a script.
     group_directory = (Path(__file__).parent.parent / 'data')
-    groups = list(group_directory.glob('group-??'))
+    groups = list(group_directory.glob('group-02'))
     if len(groups) == 0:
         raise RuntimeError('No group directory in data directory: '
                            'have you downloaded and unpacked the data?')
 
-    if len(groups) > 1:
-        raise RuntimeError('Too many group directories in data directory')
+    # if len(groups) > 1:
+    #     raise RuntimeError('Too many group directories in data directory')
     # Call function to validate data in data directory
-    validate_data(groups[0])
+    validate_data(*groups)
 
 
 if __name__ == '__main__':
