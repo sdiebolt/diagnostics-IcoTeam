@@ -53,12 +53,13 @@ def file_hash(filename):
 
 
 def validate_data(data_directory):
-    """ Read ``data_hashes.txt`` file in `data_directory`, check hashes
+    """ Read ``hash_list.txt`` or ``data_hashes.txt`` file in from `group-*` directory in `data_directory`,
+    then check hashes. It will check all groups.
 
     Parameters
     ----------
     data_directory : str
-        Directory containing data and ``data_hashes.txt`` file.
+        Directory containing data and `group-*` directory where ``hash_list.txt`` file is.
 
     Returns
     -------
@@ -66,9 +67,15 @@ def validate_data(data_directory):
 
     Raises
     ------
+    TypeError : 
+        If `data_directory` cannot be casted to pathlib.Path
+    ValueError :
+        If `data_directory` returns False to `data_directory.is_dir()`
+    ValueError :
+        If there is no ``hash_list.txt`` or ``data_hashes.txt`` file inside the group directories.
     ValueError:
         If hash value for any file is different from hash value recorded in
-        ``data_hashes.txt`` file.
+        ``hash_list.txt`` file.
     """
     # Try data_directory as Path
     try:
@@ -95,7 +102,7 @@ def validate_data(data_directory):
     if not hash_paths:
         raise ValueError(
             "No `hash_list.txt` or `data_hashes.txt` file was found in"
-            f" {data_directory / 'group-*'}." 
+            f" {data_directory / 'group-*'}."
         )
 
     for hash_path in hash_paths:
