@@ -52,7 +52,7 @@ def file_hash(filename):
     return sha1(byte_contents).hexdigest()
 
 
-def validate_data(*data_directories):
+def validate_data(data_directory):
     """ Read ``hash_list.txt`` from `data_directory`, then check hashes.
     Accepts more than one data_directory using *args.
 
@@ -67,70 +67,66 @@ def validate_data(*data_directories):
 
     Raises
     ------
-    TypeError : 
+    TypeError
         If `data_directory` cannot be casted to pathlib.Path
-    ValueError :
-        If `data_directory` returns False to `data_directory.is_dir()`
-    ValueError :
-        If `data_directory / hash_list.txt` returns False to `is_file()`
-    ValueError:
+    ValueError
+        If `data_directory` or ``hash_list.txt`` isn't found.
+    RuntimeError
         If hash value for any file is different from hash value recorded in
         ``hash_list.txt`` file.
     """
+    # Try data_directory as Path
+    try:
+        data_directory = Path(data_directory)
+    except TypeError:
+        raise TypeError(
+            "data_directory argument must be a pathlib.Path (or a type that supports"
+            " casting to pathlib.Path, such as string)."
+        )
 
-    for data_directory in data_directories:
-        # Try data_directory as Path
-        try:
-            data_directory = Path(data_directory)
-        except TypeError:
-            raise TypeError(
-                "data_directory argument must be a pathlib.Path (or a type that supports"
-                " casting to pathlib.Path, such as string)."
+    # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
+    data_directory = data_directory.expanduser().resolve()
+
+    # Check if directory exists
+    if not data_directory.is_dir():
+        raise ValueError(f"Directory not found: {data_directory}.")
+
+    # Get hash file path
+    hash_path = data_directory / "hash_list.txt"
+
+    # Check if any hash file exist
+    if not hash_path.is_file():
+        raise ValueError(f"File not found: {hash_path}.")
+
+    # Read lines from ``data_hashes.txt`` file.
+    hashes_lines = hash_path.read_text().splitlines()
+    for line in hashes_lines:
+        # Split into SHA1 hash and filename
+        expected_hash, filename = line.split()
+
+        # Calculate actual hash for given filename.
+        actual_hash = file_hash(data_directory.parent / filename)
+
+        # If hash for filename is not the same as the one in the file, raise
+        # ValueError
+        if not actual_hash == expected_hash:
+            raise RuntimeError(
+                f"Hashes were not validated. File {filename} expected hash was {expected_hash} and"
+                f" actual hash is {actual_hash}."
             )
-
-        # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
-        data_directory = data_directory.expanduser().resolve()
-
-        # Check if directory exists
-        if not data_directory.is_dir():
-            raise ValueError(f"Directory not found: {data_directory}.")
-        
-        # Get hash file path
-        hash_path = data_directory / "hash_list.txt"
-
-        # Check if any hash file exist
-        if not hash_path.is_file():
-            raise ValueError(f"File not found: {hash_path}.")
-
-        # Read lines from ``data_hashes.txt`` file.
-        hashes_lines = hash_path.read_text().splitlines()
-        for line in hashes_lines:
-            # Split into SHA1 hash and filename
-            expected_hash, filename = line.split()
-
-            # Calculate actual hash for given filename.
-            actual_hash = file_hash(data_directory.parent / filename)
-
-            # If hash for filename is not the same as the one in the file, raise
-            # ValueError
-            if not actual_hash == expected_hash:
-                raise ValueError(
-                    f"Hashes were not validated. File {filename} expected hash was {expected_hash} and"
-                    f" actual hash is {actual_hash}."
-                )
 
 def main():
     # This function (main) called when this file run as a script.
     group_directory = (Path(__file__).parent.parent / 'data')
-    groups = list(group_directory.glob('group-02'))
+    groups = list(group_directory.glob('group-??'))
     if len(groups) == 0:
         raise RuntimeError('No group directory in data directory: '
                            'have you downloaded and unpacked the data?')
 
-    # if len(groups) > 1:
-    #     raise RuntimeError('Too many group directories in data directory')
+    if len(groups) > 1:
+        raise RuntimeError('Too many group directories in data directory')
     # Call function to validate data in data directory
-    validate_data(*groups)
+    validate_data(groups)
 
 
 if __name__ == '__main__':
