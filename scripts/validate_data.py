@@ -70,13 +70,51 @@ def validate_data(data_directory):
         If hash value for any file is different from hash value recorded in
         ``data_hashes.txt`` file.
     """
-    # Read lines from ``data_hashes.txt`` file.
-    # Split into SHA1 hash and filename
-    # Calculate actual hash for given filename.
-    # If hash for filename is not the same as the one in the file, raise
-    # ValueError
-    # This is a placeholder, replace it to write your solution.
-    raise NotImplementedError('This is just a template -- you are expected to code this.')
+    # Try data_directory as Path
+    try:
+        data_directory = Path(data_directory)
+    except TypeError:
+        raise TypeError(
+            "data_directory argument must be a pathlib.Path (or a type that supports"
+            " casting to pathlib.Path, such as string)."
+        )
+
+    # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
+    data_directory = data_directory.expanduser().resolve()
+
+    # Check if directory exists
+    if not data_directory.is_dir():
+        raise ValueError(f"Directory not found: {data_directory}.")
+    
+    # Get hash list using glob to potentially validate more than one group at a time
+    hash_paths = list(data_directory.glob("group-*/hash_list.txt"))
+    # Get either `hash_list.txt` or `data_hashes.txt`
+    hash_paths += list(data_directory.glob("group-*/data_hashes.txt"))
+
+    # Check if any hash file exist
+    if not hash_paths:
+        raise ValueError(
+            "No `hash_list.txt` or `data_hashes.txt` file was found in"
+            f" {data_directory / 'group-*'}." 
+        )
+
+    for hash_path in hash_paths:
+        # Read lines from ``data_hashes.txt`` file.
+        hashes_lines = hash_path.read_text().splitlines()
+        for line in hashes_lines:
+            # Split into SHA1 hash and filename
+            expected_hash, filename = line.split()
+
+            # Calculate actual hash for given filename.
+            actual_hash = file_hash(data_directory / filename)
+
+            # If hash for filename is not the same as the one in the file, raise
+            # ValueError
+            if not actual_hash == expected_hash:
+                raise ValueError(
+                    f"Hashes were not validated. File {filename} expected hash was {expected_hash} and"
+                    f" actual hash is {actual_hash}."
+                )
 
 
 def main():
