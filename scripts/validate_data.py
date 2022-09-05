@@ -21,6 +21,13 @@ def file_hash(filename):
     -------
     hash : str
         SHA1 hexadecimal hash string for contents of `filename`.
+
+    Raises
+    -------
+    TypeError :
+        If filename cannot be casted to pathlib.Path
+    ValueError :
+        If filename returns False with ``filename.is_file()``
     """
     # Try filename as Path
     try:
