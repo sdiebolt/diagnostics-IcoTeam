@@ -108,7 +108,7 @@ def validate_data(*data_directories):
             expected_hash, filename = line.split()
 
             # Calculate actual hash for given filename.
-            actual_hash = file_hash(data_directory / filename)
+            actual_hash = file_hash(data_directory.parent / filename)
 
             # If hash for filename is not the same as the one in the file, raise
             # ValueError
