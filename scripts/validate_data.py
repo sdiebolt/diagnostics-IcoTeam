@@ -22,11 +22,27 @@ def file_hash(filename):
     hash : str
         SHA1 hexadecimal hash string for contents of `filename`.
     """
+    # Try filename as Path
+    try:
+        filename = Path(filename)
+    except TypeError:
+        raise TypeError(
+            "filename argument must be a pathlib.Path (or a type that supports"
+            " casting to pathlib.Path, such as string)."
+        )
+    
+    # Get absolute filename, expand ~user formats and resolving symlinks or relative paths
+    filename = filename.expanduser().resolve()
+
+    # Check if file exists
+    if not filename.is_file():
+        raise ValueError(f"File not found: {filename}.")
+
     # Open the file, read contents as bytes.
+    byte_contents = filename.read_bytes()
+
     # Calculate, return SHA1 has on the bytes from the file.
-    # This is a placeholder, replace it to write your solution.
-    raise NotImplementedError(
-        'This is just a template -- you are expected to code this.')
+    return sha1(byte_contents).hexdigest()
 
 
 def validate_data(data_directory):
