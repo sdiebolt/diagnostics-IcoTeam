@@ -1,11 +1,15 @@
 """ Module with routines for finding outliers
 """
+import numpy as np
 
 from pathlib import Path
 
+from .detectors import iqr_detector
+from .spm_funcs import get_spm_globals
+
 
 def detect_outliers(fname):
-    return [42]
+    return np.argwhere(iqr_detector(get_spm_globals(fname)))
 
 
 def find_outliers(data_directory):
