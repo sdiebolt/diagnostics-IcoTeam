@@ -126,7 +126,7 @@ def main():
     if len(groups) > 1:
         raise RuntimeError('Too many group directories in data directory')
     # Call function to validate data in data directory
-    validate_data(groups)
+    validate_data(groups[0])
 
 
 if __name__ == '__main__':
