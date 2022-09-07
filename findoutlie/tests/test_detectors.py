@@ -1,27 +1,16 @@
-""" Test script for detector functions
+"""Test script for detector functions.
 
-Run these tests with::
+To run these scripts, use pytest, e.g. 
 
-    python3 findoutlie/tests/test_detectors.py
+    pytest findoutlie/tests/
 
-or better, in IPython::
-
-    %run findoutlie/tests/test_detectors.py
 """
-
-from pathlib import Path
-import sys
-
-MY_DIR = Path(__file__).parent
-
-sys.path.append(str(MY_DIR.parent))
 
 import numpy as np
 
-# This import needs the directory containing the findoutlie directory
-# on the Python path.
-from detectors import iqr_detector
+from pathlib import Path
 
+from ..detectors import iqr_detector
 
 def test_iqr_detector():
     # From: http://www.purplemath.com/modules/boxwhisk3.htm
@@ -33,9 +22,3 @@ def test_iqr_detector():
     # Test not-default value for outlier proportion
     is_outlier = iqr_detector(example_values, 0.5)
     assert np.all(example_values[is_outlier] == [10.2, 14.1, 15.1, 15.9, 16.4])
-
-
-if __name__ == '__main__':
-    # File being executed as a script
-    test_iqr_detector()
-    print('Tests passed')
